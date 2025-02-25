@@ -10,15 +10,21 @@ npm install rn-uikit-ikong
 
 ## Usage
 
-
 ```js
-import { RnUikitIkongView } from "rn-uikit-ikong";
+import { View, Text } from "rn-uikit-ikong";
 
 // ...
 
-<RnUikitIkongView color="tomato" />
-```
+<View shadow flex1 fullHeight bgColor={Colors.lighter} padding={16} paddingHorizontal={} marginVertical={} style={styles.sectionContainer}/>
+<Text size={16} bold centerAlign style={[
+          {
+            color: isDarkMode ? Colors.white : Colors.black,
+          },
+        ]}>
+  {title}
+</Text>
 
+```
 
 ## Contributing
 
