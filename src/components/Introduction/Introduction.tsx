@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { View } from '../View';
@@ -42,7 +42,7 @@ const defaultDataWith6Colors = [
   },
 ];
 
-const Introduction = (props: IntroductionProps) => {
+export const Introduction = (props: IntroductionProps) => {
   const dataIntro = props?.dataList || defaultDataWith6Colors;
   const { width, height } = useWindowDimensions();
 
@@ -70,16 +70,21 @@ const Introduction = (props: IntroductionProps) => {
       props?.onEnd && props?.onEnd();
     }
   };
-  React.useEffect(() => {
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
     if (props?.autoPlay) {
-      const interval = setInterval(
+      interval = setInterval(
         () => {
           ref.current?.next();
         },
         parseInt(props?.timePlay || '3000', 10)
       );
-      return () => clearInterval(interval);
     }
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [props?.autoPlay, props?.timePlay, indexScreen]);
 
   return (
@@ -182,5 +187,3 @@ const Introduction = (props: IntroductionProps) => {
     </View>
   );
 };
-
-export default Introduction;
