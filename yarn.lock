@@ -10544,6 +10544,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-reanimated-carousel@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "react-native-reanimated-carousel@npm:4.0.2"
+  peerDependencies:
+    react: ">=18.0.0"
+    react-native: ">=0.70.3"
+    react-native-gesture-handler: ">=2.9.0"
+    react-native-reanimated: ">=3.0.0"
+  checksum: 1f3d0434410a9e365420d2aa029d7af087a7dee6edd9be62019cbb3e14b13bb25a5ea4790fcc9a158208b027a3e7203ff02e62184753e6c3cb692392f8dcfdf4
+  languageName: node
+  linkType: hard
+
 "react-native-reanimated@npm:^3.17.0":
   version: 3.17.0
   resolution: "react-native-reanimated@npm:3.17.0"
@@ -11165,6 +11177,7 @@ __metadata:
     react-native: 0.78.0
     react-native-builder-bob: ^0.37.0
     react-native-reanimated: ^3.17.0
+    react-native-reanimated-carousel: ^4.0.2
     release-it: ^17.10.0
     turbo: ^1.10.7
     typescript: ^5.2.2
