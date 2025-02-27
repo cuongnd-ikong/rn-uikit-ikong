@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
-import { View } from '../View';
-import Carousel, { Pagination } from 'react-native-reanimated-carousel';
-import type { ICarouselInstance } from 'react-native-reanimated-carousel';
+import React from 'react';
+import { Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
+import { View } from '../View';
+import type { ICarouselInstance } from 'react-native-reanimated-carousel';
+import Carousel, { Pagination } from 'react-native-reanimated-carousel';
+import { Text } from '../Text';
 type IntroductionProps = {
-  renderItemComponent: (
+  renderItemComponent?: (
     item: any,
     index: number,
     animationValue: any
@@ -16,32 +18,45 @@ type IntroductionProps = {
     onPressNextToEnd: () => void;
   }) => React.ReactElement;
   onEnd?: () => void;
-  dataList: any[];
+  dataList?: any[];
   autoPlay?: boolean;
   timePlay?: string;
   renderAds?: () => React.ReactElement;
 };
 
 const defaultDataWith6Colors = [
-  { color: 'red', title: 'red', adsItem: <></> },
-  { color: 'blue', title: 'blue', adsItem: <></> },
-  { color: 'orange', title: 'orange', adsItem: <></> },
+  {
+    color: 'red',
+    title: 'red',
+    adsItem: <View height={300} flex1 bgColor={'red'} />,
+  },
+  {
+    color: 'blue',
+    title: 'blue',
+    adsItem: <View height={300} flex1 bgColor={'blue'} />,
+  },
+  {
+    color: 'orange',
+    title: 'orange',
+    adsItem: <View height={300} flex1 bgColor={'orange'} />,
+  },
 ];
 
-const PAGE_WIDTH = 430;
+const Introduction = (props: IntroductionProps) => {
+  const dataIntro = props?.dataList || defaultDataWith6Colors;
+  const { width, height } = useWindowDimensions();
 
-export const Introduction = (props: IntroductionProps) => {
   const progress = useSharedValue<number>(0);
   const baseOptions = {
     vertical: false,
-    width: PAGE_WIDTH,
+    width: width,
+    height: height,
   } as const;
 
   const ref = React.useRef<ICarouselInstance>(null);
   const [indexScreen, setIndex] = React.useState(0);
 
   const onPressPagination = (index: number) => {
-    console.log('data', progress.value);
     ref.current?.scrollTo({
       count: index - progress.value,
       animated: true,
@@ -49,13 +64,13 @@ export const Introduction = (props: IntroductionProps) => {
   };
 
   const onPressNextToEnd = () => {
-    if (indexScreen < props?.dataList.length - 1) {
+    if (indexScreen < dataIntro.length - 1) {
       ref.current?.next();
     } else {
       props?.onEnd && props?.onEnd();
     }
   };
-  useEffect(() => {
+  React.useEffect(() => {
     if (props?.autoPlay) {
       const interval = setInterval(
         () => {
@@ -65,44 +80,107 @@ export const Introduction = (props: IntroductionProps) => {
       );
       return () => clearInterval(interval);
     }
-    return undefined;
   }, [props?.autoPlay, props?.timePlay, indexScreen]);
 
   return (
     <View style={{ position: 'relative', flex: 1 }}>
       <Carousel
-        style={{ height: '100%' }}
         ref={ref}
         {...baseOptions}
         loop
         onScrollEnd={(index) => setIndex(index)}
         onSnapToItem={(index) => setIndex(index)}
         onProgressChange={progress}
-        data={props?.dataList}
+        data={dataIntro}
         renderItem={({ item, index, animationValue }) =>
-          props?.renderItemComponent(item, index, animationValue) || <></>
+          props?.renderItemComponent ? (
+            props?.renderItemComponent(item, index, animationValue)
+          ) : (
+            <View style={{ flex: 1 }}>
+              <Image source={item?.image} style={{ flex: 1, width: '100%' }} />
+              {props?.renderPagination ? (
+                props?.renderPagination({
+                  progress,
+                  data: dataIntro,
+                  onPressPagination,
+                  onPressNextToEnd,
+                })
+              ) : (
+                <View>
+                  <Text
+                    numberOfLines={2}
+                    bold
+                    style={{ paddingHorizontal: 15, textAlign: 'center' }}
+                    size={24}
+                    lineHeight={30}
+                    color={'#000000'}
+                  >
+                    {item?.title}
+                  </Text>
+                  <View
+                    style={{
+                      paddingVertical: 15,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingHorizontal: 15,
+                    }}
+                  >
+                    <Pagination.Basic
+                      size={15}
+                      progress={progress}
+                      data={dataIntro}
+                      dotStyle={{
+                        borderRadius: 100,
+                        backgroundColor: '#EA7000',
+                      }}
+                      activeDotStyle={{
+                        borderRadius: 100,
+                        // overflow: 'hidden',
+                        backgroundColor: '#f1f1f1',
+                        borderWidth: 1,
+                        borderColor: '#EA7000',
+                      }}
+                      containerStyle={[
+                        {
+                          gap: 5,
+                          marginBottom: 10,
+                        },
+                      ]}
+                      horizontal
+                      onPress={onPressPagination}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        onPressNextToEnd();
+                      }}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          padding: 10,
+                          color: '#EA7000',
+                          fontSize: 24,
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Next
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+              <View height={300}>{item?.adsItem}</View>
+            </View>
+          )
         }
         {...props}
       />
-      <View style={{ position: 'absolute', bottom: 0, width: '100%' }}>
-        {props?.renderPagination ? (
-          props?.renderPagination({
-            progress,
-            data: props?.dataList || defaultDataWith6Colors,
-            onPressPagination,
-            onPressNextToEnd,
-          })
-        ) : (
-          <Pagination.Basic
-            progress={progress}
-            data={props?.dataList}
-            dotStyle={{ backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 50 }}
-            containerStyle={{ gap: 5, marginTop: 10 }}
-            onPress={onPressPagination}
-          />
-        )}
-        {props?.renderAds && props?.renderAds()}
-      </View>
     </View>
   );
 };
+
+export default Introduction;
