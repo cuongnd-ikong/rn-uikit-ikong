@@ -26,19 +26,19 @@ type IntroductionProps = {
 
 const defaultDataWith6Colors = [
   {
-    image: 'https://source.unsplash.com/random/200x300?sig=1',
+    image: 'https://picsum.photos/800/300?random=5',
     color: 'red',
     title: 'red',
     adsItem: <View height={300} flex1 bgColor={'red'} />,
   },
   {
-    image: 'https://source.unsplash.com/random/200x300?sig=1',
+    image: 'https://picsum.photos/200/300?random=2',
     color: 'blue',
     title: 'blue',
     adsItem: <View height={300} flex1 bgColor={'blue'} />,
   },
   {
-    image: 'https://source.unsplash.com/random/200x300?sig=1',
+    image: 'https://picsum.photos/500/300?random=1',
     color: 'orange',
     title: 'orange',
     adsItem: <View height={300} flex1 bgColor={'orange'} />,
@@ -75,10 +75,14 @@ export const Introduction = (props: IntroductionProps) => {
     }
   };
 
-  const itemDefault = ({ item, index }: { item: any; index: number }) => {
+  const itemDefault = ({ item }: { item: any }) => {
     return (
       <View style={{ flex: 1 }}>
-        <Image source={item?.image} style={{ flex: 1, width: '100%' }} />
+        <Image
+          src={item?.image}
+          resizeMode="stretch"
+          style={{ flex: 1, width: '100%' }}
+        />
         {props?.renderPagination ? (
           props?.renderPagination({
             progress,
@@ -177,7 +181,7 @@ export const Introduction = (props: IntroductionProps) => {
   }, [props?.autoPlay, props?.timePlay, indexScreen]);
 
   return (
-    <View style={{ position: 'relative', flex: 1 }}>
+    <View flex1>
       <Carousel
         ref={ref}
         pagingEnabled
@@ -190,7 +194,7 @@ export const Introduction = (props: IntroductionProps) => {
         renderItem={({ item, index, animationValue }) =>
           props?.renderItemComponent
             ? props?.renderItemComponent(item, index, animationValue)
-            : itemDefault({ item, index })
+            : itemDefault({ item })
         }
         {...props}
       />
