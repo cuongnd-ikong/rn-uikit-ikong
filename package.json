@@ -1,6 +1,6 @@
 {
   "name": "rn-uikit-ikong",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "ui kit",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
