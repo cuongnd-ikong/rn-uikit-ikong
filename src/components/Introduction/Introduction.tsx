@@ -1,10 +1,24 @@
 import React, { useEffect } from 'react';
-import { Image, TouchableOpacity, useWindowDimensions } from 'react-native';
+import {
+  Alert,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { View } from '../View';
-import type { ICarouselInstance } from 'react-native-reanimated-carousel';
-import Carousel, { Pagination } from 'react-native-reanimated-carousel';
+import Carousel, {
+  Pagination,
+  type ICarouselInstance,
+} from 'react-native-reanimated-carousel';
+import {
+  GrantPermissions,
+  type PermissionDataType,
+  type PermissionHandler,
+} from '../GrantPermissions/GrantPermissions';
 import { Text } from '../Text';
+import { View } from '../View';
+// import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
+
 type IntroductionProps = {
   renderItemComponent?: (
     item: any,
@@ -22,6 +36,19 @@ type IntroductionProps = {
   autoPlay?: boolean;
   timePlay?: string;
   loop?: boolean;
+  showAds?: boolean;
+  dataPermission?: object;
+  permissionHandler?: PermissionHandler;
+  permissions?: PermissionDataType[];
+  defaultStep2: { image: string; title: string; titleNextStep: string };
+  defaultStep3: {
+    image: string;
+    title: string;
+    adsComponent: React.ReactElement;
+    titleNextStep: string;
+  };
+  screenStep1: React.ReactElement;
+  isPermission: boolean;
 };
 
 const defaultDataWith6Colors = [
@@ -48,18 +75,17 @@ const defaultDataWith6Colors = [
 export const Introduction = (props: IntroductionProps) => {
   const dataIntro = props?.dataList || defaultDataWith6Colors;
   const { width, height } = useWindowDimensions();
-
   const progress = useSharedValue<number>(0);
-
   const baseOptions = {
     vertical: false,
     width: width,
     height: height,
   } as const;
-
   const ref = React.useRef<ICarouselInstance>(null);
   const [indexScreen, setIndex] = React.useState(0);
-
+  const [state, setState] = React.useState({
+    continue: true,
+  });
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
       count: index - progress.value,
@@ -71,7 +97,8 @@ export const Introduction = (props: IntroductionProps) => {
     if (indexScreen < dataIntro.length - 1) {
       ref.current?.next();
     } else {
-      props?.onEnd && props?.onEnd();
+      setState({ continue: false });
+      // props?.onEnd && props?.onEnd();
     }
   };
 
@@ -182,22 +209,42 @@ export const Introduction = (props: IntroductionProps) => {
 
   return (
     <View flex1>
-      <Carousel
-        ref={ref}
-        pagingEnabled
-        defaultIndex={0}
-        {...baseOptions}
-        onScrollEnd={(index) => setIndex(index)}
-        onSnapToItem={(index) => setIndex(index)}
-        onProgressChange={progress}
-        data={dataIntro}
-        renderItem={({ item, index, animationValue }) =>
-          props?.renderItemComponent
-            ? props?.renderItemComponent(item, index, animationValue)
-            : itemDefault({ item })
-        }
-        {...props}
-      />
+      {!!state?.continue ? (
+        <Carousel
+          ref={ref}
+          pagingEnabled
+          defaultIndex={0}
+          {...baseOptions}
+          onScrollEnd={(index) => setIndex(index)}
+          onSnapToItem={(index) => setIndex(index)}
+          onProgressChange={progress}
+          data={dataIntro}
+          renderItem={({ item, index, animationValue }) =>
+            props?.renderItemComponent
+              ? props?.renderItemComponent(item, index, animationValue)
+              : itemDefault({ item })
+          }
+          {...props}
+        />
+      ) : (
+        <GrantPermissions
+          onCancel={props?.onEnd}
+          isPermission={props?.isPermission || false}
+          screenStep1={props?.screenStep1 || <View flex1 bgColor={'red'} />}
+          defaultStep2={props?.defaultStep2}
+          defaultStep3={props?.defaultStep3}
+          permissions={props?.permissions}
+          permissionHandler={props?.permissionHandler}
+          onComplete={(grantedPermissions) => {
+            Alert.alert(
+              'Granted permissions',
+              JSON.stringify(grantedPermissions)
+            );
+            props?.onEnd;
+            console.log('Granted permissions:', grantedPermissions);
+          }}
+        />
+      )}
     </View>
   );
 };
