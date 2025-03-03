@@ -46,6 +46,7 @@ type IntroductionProps = {
     title: string;
     adsComponent: React.ReactElement;
     titleNextStep: string;
+    descNextStep?: string;
   };
   screenStep1: React.ReactElement;
   isPermission: boolean;

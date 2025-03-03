@@ -1,18 +1,18 @@
+import React from 'react';
 import {
+  Alert,
   Image,
-  // StyleSheet,
-  Switch,
-  TouchableOpacity,
   PermissionsAndroid,
   Platform,
-  Alert,
+  SafeAreaView,
+  Switch,
+  TouchableOpacity,
 } from 'react-native';
-import React from 'react';
-import { View } from '../View';
-import { Text } from '../Text';
-
-import { Platform as P } from '../../utils/index';
+import { IconArrowRight, IconClose } from '../../assets';
 import { COLOR } from '../../styles';
+import { Platform as P } from '../../utils/index';
+import { Text } from '../Text';
+import { View } from '../View';
 
 export type PermissionType =
   | 'camera'
@@ -46,6 +46,7 @@ type GrantPermissionsProps = {
     title: string;
     adsComponent: React.ReactElement;
     titleNextStep: string;
+    descNextStep?: string;
   };
   isPermission: boolean;
 };
@@ -66,14 +67,6 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
       ) || {},
   });
 
-  /*************  ✨ Codeium Command ⭐  *************/
-  /**
- * Requests permission for a given feature on the device.
- * For Android, it uses PermissionsAndroid to request the permission.
- * For iOS, it currently shows an alert indicating that the permission handling is not implemented.
- * 
-
-/******  8b44b052-28be-42c4-9cbc-51fd7c3cc162  *******/
   const defaultRequestPermission = async (
     permission: string
   ): Promise<boolean> => {
@@ -122,51 +115,63 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
 
   const header = (title: string) => {
     return (
-      <View
+      <SafeAreaView
         style={{
           width: '100%',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: 25,
+          // backgroundColor: 'blue',
         }}
       >
         <Text
-          style={{ textAlign: 'center', fontWeight: 'bold' }}
+          style={{
+            textAlign: 'center',
+            fontWeight: 'bold',
+            marginVertical: 10,
+          }}
           size={20}
           numberOfLines={2}
         >
-          {title}
+          {title || '123123123123'}
         </Text>
-      </View>
+      </SafeAreaView>
     );
   };
 
   const screenStep1 = () => {
     return (
       <View flex1 style={{ position: 'relative' }}>
-        {props?.screenStep1}
-        <TouchableOpacity
-          onPress={() =>
-            props?.isPermission
-              ? props?.onCancel
-              : setState((pre) => ({ ...pre, step: 2 }))
-          }
+        <SafeAreaView
           style={{
-            position: 'absolute',
-            top: 50,
-            right: 0,
-            backgroundColor: COLOR.dark40,
-            borderRadius: 50,
-            width: 30,
-            height: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
+            backgroundColor: 'transparent',
+            zIndex: 9999,
+            flex: 1,
+            alignItems: 'flex-end',
+            marginRight: 20,
           }}
         >
-          <Text size={20} color="white">
-            x
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              props?.isPermission
+                ? props?.onCancel
+                : setState((pre) => ({ ...pre, step: 2 }))
+            }
+          >
+            <IconClose resizeMode="contain" width={20} />
+          </TouchableOpacity>
+        </SafeAreaView>
+        <View
+          style={{
+            flex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          {props?.screenStep1}
+        </View>
       </View>
     );
   };
@@ -243,7 +248,7 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
             {header(props?.defaultStep3?.title)}
             <Image
               src={
-                // props?.defaultStep3?.image ||
+                props?.defaultStep3?.image ||
                 'https://picsum.photos/200/300?random=3'
               }
               style={{
@@ -280,7 +285,7 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
                     {permission.label}
                   </Text>
                   <Switch
-                    // trackColor={{false: '#123123', true: '#2222'}}
+                    trackColor={{ false: '#123123', true: '#2222' }}
                     thumbColor={COLOR.hex_EA7000}
                     value={state.permissions[permission.key] || false}
                     onValueChange={() => handlePermissionToggle(permission)}
@@ -295,6 +300,7 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
             >
               <View>
                 <Text
+                  lineHeight={28}
                   size={28}
                   style={{ fontWeight: 'bold' }}
                   color={COLOR.dark}
@@ -302,20 +308,19 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
                   {props?.defaultStep3?.titleNextStep}
                 </Text>
                 <Text
+                  lineHeight={11}
                   size={11}
                   style={{ fontWeight: 'bold' }}
                   color={COLOR.dark40}
                 >
-                  Grant permission later
+                  {props?.defaultStep3?.descNextStep}
                 </Text>
               </View>
-              <Text
-                size={18}
-                style={{ fontWeight: 'bold', marginLeft: 10 }}
-                color={COLOR.hex_EA7000}
-              >
-                {'>'}
-              </Text>
+              <IconArrowRight
+                resizeMode="contain"
+                height={20}
+                style={{ marginLeft: 5 }}
+              />
             </TouchableOpacity>
             <View
               style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
@@ -347,5 +352,3 @@ export const GrantPermissions = (props: GrantPermissionsProps) => {
   };
   return <>{showScreen()}</>;
 };
-
-// const styles = StyleSheet.create({});
